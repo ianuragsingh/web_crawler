@@ -8,7 +8,6 @@ Created on Mon Apr 15 15:38:01 2019
 
 import scrapy
 from .car import Car;
-import json;
 from datetime import datetime
 
 
@@ -96,7 +95,7 @@ class QuotesSpider(scrapy.Spider):
         next_page = response.xpath("//ul[@class='pager']/li[contains(@class, 'pagination-next')]/a/@href").extract_first();
         next_page_url = response.urljoin(next_page);
         #print(next_page_url)
-        #yield scrapy.Request(next_page_url, callback=self.parse);
+        yield scrapy.Request(next_page_url, callback=self.parse);
         
         
     
