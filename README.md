@@ -19,7 +19,18 @@ Project os developed in python 3.x
 https://scrapy.org/download/ 
 
 2) Go to main folder of project
-3) Run 'crapy crawl quotes'
+
+3) Run 
+
+scrapy crawl quotes
+
+or 
+
+scrapy crawl quotes -a url='https://sg.carousell.com/categories/cars-32/'
+
+or if you want to run in background
+
+scrapy crawl quotes -a url='https://sg.carousell.com/categories/cars-32/' > 404.txt &
 
 
 output file will be there in main folder with time stamp.

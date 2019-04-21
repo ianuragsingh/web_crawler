@@ -22,14 +22,10 @@ class QuotesSpider(scrapy.Spider):
     
     PRODUCT_DETAIL_CLASS_NAME = 'ay-c ay-b';
     LIST_CLASS_NAME = 'bB-l';
-
-
-    start_urls = [
-        'https://sg.carousell.com/categories/cars-32/',
-    ]
-
    
-    def __init__(self):
+    def __init__(self, url='https://sg.carousell.com/categories/cars-32/', *args, **kwargs):
+        super(QuotesSpider, self).__init__(*args, **kwargs)
+        self.start_urls = [url];
         today = datetime.now();
         self.datafile = open(today.strftime("%Y_%m_%d_%H_%M_%S"), 'w');
     
