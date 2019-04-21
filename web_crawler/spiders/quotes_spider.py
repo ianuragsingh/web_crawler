@@ -40,27 +40,27 @@ class QuotesSpider(scrapy.Spider):
         
         
         for quote in response.xpath("//div[@class='{}']".format(self.FIRST_PAGE_PRODUCT_CLASS_NAME)):
-            car = Car();
+            item = {};
             
-            car.title = quote.xpath(".//div[@class='{}']/text()".format(self.TITLE_CLASS_NAME)).extract_first();
-            #print(car.title)
+            item['title'] = quote.xpath(".//div[@class='{}']/text()".format(self.TITLE_CLASS_NAME)).extract_first();
+            #print(item.title)
             
             #car.posted_on = quote.xpath(".//time[contains(@class,'{}')]/span/text()".format(self.POSTED_CLASS_NAME)).extract_first();
-            car.posted_on = quote.xpath(".//a/div/time/span/text()").extract_first();
-            #print(car.posted_on);
+            item['posted_on'] = quote.xpath(".//a/div/time/span/text()").extract_first();
+            #print(item.posted_on);
             
-            car.seller = quote.xpath(".//a/div/div/text()").extract_first();
-            #print(car.seller);
+            item['seller'] = quote.xpath(".//a/div/div/text()").extract_first();
+            #print(item.seller);
             
-            car.price =  quote.xpath(".//div[@class='{}']/div/text()".format(self.PRICE_CLASS_NAME)).extract_first();
-            #print(car.price)
+            item['price'] =  quote.xpath(".//div[@class='{}']/div/text()".format(self.PRICE_CLASS_NAME)).extract_first();
+            #print(item.price)
             
             reg_year = quote.xpath(".//div[@class='{}']/div[2]/text()".format(self.PRICE_CLASS_NAME)).extract_first();
             
             try:
                 if reg_year.index("Reg: ") == 0:
-                    car.reg_year = reg_year[5:len(reg_year)];
-                    #print(car.reg_year);
+                    item['reg_year'] = reg_year[5:len(reg_year)];
+                    #print(item.reg_year);
             except:
                 pass;
                 
@@ -70,34 +70,34 @@ class QuotesSpider(scrapy.Spider):
             
             try:
                 if depre.index("Depre: ") == 0:
-                    car.depre = depre[7:len(depre)];
-                    #print(car.depre);
+                    item['depre'] = depre[7:len(depre)];
+                    #print(item.depre);
             except:
                 pass;
             
             #svg = quote.xpath("boolean(.//svg[contains(@class, '{}')])".format(self.BOOSTED_CLASS_NAME)).extract_first();
-            car.boosted = quote.xpath("boolean(.//a/div/time/svg)").extract_first();
-            #print(car.boosted);
+            item['boosted'] = quote.xpath("boolean(.//a/div/time/svg)").extract_first();
+            #print(item.boosted);
             
             link = quote.xpath(".//figcaption/a/@href").extract_first();
             #print(link);
-            car.listingId  = link.split("/")[2].split('-')[-1];
+            item['listingId']  = link.split("/")[2].split('-')[-1];
             
             product_url = response.urljoin(link);
-            yield scrapy.Request(product_url, callback=self.parseProduct, meta={'item': car});
+            yield scrapy.Request(product_url, callback=self.parseProduct, meta={'inventory': item});
             
         
         # handle next page
         next_page = response.xpath("//ul[@class='pager']/li[contains(@class, 'pagination-next')]/a/@href").extract_first();
         next_page_url = response.urljoin(next_page);
         #print(next_page_url)
-        yield scrapy.Request(next_page_url, callback=self.parse);
+        #yield scrapy.Request(next_page_url, callback=self.parse);
         
         
     
     def parseProduct(self, response):
         #print(response.url);
-        car = response.meta['item'];
+        item = response.meta['inventory'];
          
         for product in response.xpath("//div[@class='{}']/section".format(self.PRODUCT_DETAIL_CLASS_NAME)):
             header_name = product.xpath(".//h2/text()").extract_first();
@@ -111,22 +111,22 @@ class QuotesSpider(scrapy.Spider):
                     #print("Label: " + str(label))
                     
                     if label == "Mileage":
-                        car.mileage = detail.xpath(".//p/text()").extract_first();
-                        #print(car.mileage)
+                        item['mileage'] = detail.xpath(".//p/text()").extract_first();
+                        #print(item.mileage)
                         
                     if label == "COE Expiry":
-                        car.coe_expiry = detail.xpath(".//p/text()").extract_first();
-                        #print(car.coe_expiry);
+                        item['coe_expiry'] = detail.xpath(".//p/text()").extract_first();
+                        #print(item.coe_expiry);
                         
                     if label == "Engine Capacity (cc)":
-                        car.engine_capicity = detail.xpath(".//p/text()").extract_first();
-                        #print(car.engine_capicity)
+                        item['engine_capicity'] = detail.xpath(".//p/text()").extract_first();
+                        #print(item.engine_capicity)
         
             
-        #print(car);
+        #print(item);
         
         # write car object in file
-        self.datafile.write(str(car));
+        self.datafile.write(str(item));
         self.datafile.write(' ')
         return;
 
