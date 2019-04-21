@@ -14,13 +14,15 @@ How to run?
 Project os developed in python 3.x
 
 
-1) Install scraps 
+1) Install python 3.x and compatible scrapy
 
 https://scrapy.org/download/ 
 
 2) Go to main folder of project
 3) Run 'crapy crawl quotes'
 
+
+output file will be there in main folder with time stamp.
 
 ####
 
@@ -51,6 +53,11 @@ We get various error during processing, these are details
 
 
 
+Important Note 
 
+There are 25K inventory in car category and we are making request from same IP, they may disable in future.
+
+ 
+ 
 ******************************************* END   ***************************************
 
