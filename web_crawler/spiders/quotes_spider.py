@@ -7,7 +7,6 @@ Created on Mon Apr 15 15:38:01 2019
 """
 
 import scrapy
-from .car import Car;
 from datetime import datetime
 
 
@@ -43,17 +42,17 @@ class QuotesSpider(scrapy.Spider):
             item = {};
             
             item['title'] = quote.xpath(".//div[@class='{}']/text()".format(self.TITLE_CLASS_NAME)).extract_first();
-            #print(item.title)
+            #print(item['title'])
             
             #car.posted_on = quote.xpath(".//time[contains(@class,'{}')]/span/text()".format(self.POSTED_CLASS_NAME)).extract_first();
             item['posted_on'] = quote.xpath(".//a/div/time/span/text()").extract_first();
-            #print(item.posted_on);
+            #print(item['posted_on']);
             
             item['seller'] = quote.xpath(".//a/div/div/text()").extract_first();
-            #print(item.seller);
+            #print(item['seller']);
             
             item['price'] =  quote.xpath(".//div[@class='{}']/div/text()".format(self.PRICE_CLASS_NAME)).extract_first();
-            #print(item.price)
+            #print(item['price'])
             
             reg_year = quote.xpath(".//div[@class='{}']/div[2]/text()".format(self.PRICE_CLASS_NAME)).extract_first();
             
@@ -77,7 +76,7 @@ class QuotesSpider(scrapy.Spider):
             
             #svg = quote.xpath("boolean(.//svg[contains(@class, '{}')])".format(self.BOOSTED_CLASS_NAME)).extract_first();
             item['boosted'] = quote.xpath("boolean(.//a/div/time/svg)").extract_first();
-            #print(item.boosted);
+            #print(item['boosted']);
             
             link = quote.xpath(".//figcaption/a/@href").extract_first();
             #print(link);
@@ -91,7 +90,7 @@ class QuotesSpider(scrapy.Spider):
         next_page = response.xpath("//ul[@class='pager']/li[contains(@class, 'pagination-next')]/a/@href").extract_first();
         next_page_url = response.urljoin(next_page);
         #print(next_page_url)
-        #yield scrapy.Request(next_page_url, callback=self.parse);
+        yield scrapy.Request(next_page_url, callback=self.parse);
         
         
     
@@ -112,15 +111,15 @@ class QuotesSpider(scrapy.Spider):
                     
                     if label == "Mileage":
                         item['mileage'] = detail.xpath(".//p/text()").extract_first();
-                        #print(item.mileage)
+                        #print(item['mileage'])
                         
                     if label == "COE Expiry":
                         item['coe_expiry'] = detail.xpath(".//p/text()").extract_first();
-                        #print(item.coe_expiry);
+                        #print(item['coe_expiry']);
                         
                     if label == "Engine Capacity (cc)":
                         item['engine_capicity'] = detail.xpath(".//p/text()").extract_first();
-                        #print(item.engine_capicity)
+                        #print(item['engine_capicity'])
         
             
         #print(item);
