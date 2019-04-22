@@ -12,10 +12,10 @@ from datetime import datetime
 
 class QuotesSpider(scrapy.Spider):
     name = "quotes";
+    
     #base_url = "https://sg.carousell.com/";
     datafile = None;
     
-    FIRST_PAGE_PRODUCT_CLASS_NAME = 'bM-U';
    
     def __init__(self, url='https://sg.carousell.com/categories/cars-32/', *args, **kwargs):
         super(QuotesSpider, self).__init__(*args, **kwargs)
@@ -32,8 +32,9 @@ class QuotesSpider(scrapy.Spider):
         with open(filename, 'wb') as f:
             f.write(response.body)
         
-        
-        for quote in response.xpath("//div[@class='{}']".format(self.FIRST_PAGE_PRODUCT_CLASS_NAME)):
+        #for quote in response.xpath("//div[@class='{}']".format(self.FIRST_PAGE_PRODUCT_CLASS_NAME)):
+            
+        for quote in response.xpath("//figure/div"):
             item = {};
             
             item['title'] = quote.xpath(".//figcaption/a/div/div[contains(@class, *)]/text()").extract_first();
@@ -96,7 +97,6 @@ class QuotesSpider(scrapy.Spider):
                             #print(item['price']);
 
             if header_name == "Car Details":
-                #for detail in product.xpath(".//div[@class='{}']".format(self.LIST_CLASS_NAME)):
                 for detail in product.xpath(".//div/div"):
                     label = detail.xpath(".//label/text()").extract_first();
                     #print("Label: " + str(label))
