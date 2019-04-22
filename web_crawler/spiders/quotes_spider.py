@@ -16,11 +16,7 @@ class QuotesSpider(scrapy.Spider):
     datafile = None;
     
     FIRST_PAGE_PRODUCT_CLASS_NAME = 'bM-U';
-    TITLE_CLASS_NAME = 'bM-m';
-    PRICE_CLASS_NAME = 'bM-k';
-    
     PRODUCT_DETAIL_CLASS_NAME = 'ay-c ay-b';
-    LIST_CLASS_NAME = 'bB-l';
    
     def __init__(self, url='https://sg.carousell.com/categories/cars-32/', *args, **kwargs):
         super(QuotesSpider, self).__init__(*args, **kwargs)
@@ -41,38 +37,15 @@ class QuotesSpider(scrapy.Spider):
         for quote in response.xpath("//div[@class='{}']".format(self.FIRST_PAGE_PRODUCT_CLASS_NAME)):
             item = {};
             
-            item['title'] = quote.xpath(".//div[@class='{}']/text()".format(self.TITLE_CLASS_NAME)).extract_first();
+            item['title'] = quote.xpath(".//figcaption/a/div/div[contains(@class, *)]/text()").extract_first();
             #print(item['title'])
-            
+
             #car.posted_on = quote.xpath(".//time[contains(@class,'{}')]/span/text()".format(self.POSTED_CLASS_NAME)).extract_first();
             item['posted_on'] = quote.xpath(".//a/div/time/span/text()").extract_first();
             #print(item['posted_on']);
             
             item['seller'] = quote.xpath(".//a/div/div/text()").extract_first();
             #print(item['seller']);
-            
-            item['price'] =  quote.xpath(".//div[@class='{}']/div/text()".format(self.PRICE_CLASS_NAME)).extract_first();
-            #print(item['price'])
-            
-            reg_year = quote.xpath(".//div[@class='{}']/div[2]/text()".format(self.PRICE_CLASS_NAME)).extract_first();
-            
-            try:
-                if reg_year.index("Reg: ") == 0:
-                    item['reg_year'] = reg_year[5:len(reg_year)];
-                    #print(item.reg_year);
-            except:
-                pass;
-                
-                
-            
-            depre = quote.xpath(".//div[@class='{}']/div[3]/text()".format(self.PRICE_CLASS_NAME)).extract_first();
-            
-            try:
-                if depre.index("Depre: ") == 0:
-                    item['depre'] = depre[7:len(depre)];
-                    #print(item.depre);
-            except:
-                pass;
             
             #svg = quote.xpath("boolean(.//svg[contains(@class, '{}')])".format(self.BOOSTED_CLASS_NAME)).extract_first();
             item['boosted'] = quote.xpath("boolean(.//a/div/time/svg)").extract_first();
@@ -90,7 +63,7 @@ class QuotesSpider(scrapy.Spider):
         next_page = response.xpath("//ul[@class='pager']/li[contains(@class, 'pagination-next')]/a/@href").extract_first();
         next_page_url = response.urljoin(next_page);
         #print(next_page_url)
-        yield scrapy.Request(next_page_url, callback=self.parse);
+        #yield scrapy.Request(next_page_url, callback=self.parse);
         
         
     
@@ -98,14 +71,34 @@ class QuotesSpider(scrapy.Spider):
         #print(response.url);
         item = response.meta['inventory'];
          
-        for product in response.xpath("//div[@class='{}']/section".format(self.PRODUCT_DETAIL_CLASS_NAME)):
+        for product in response.xpath("//div/section"):
             header_name = product.xpath(".//h2/text()").extract_first();
             #print("Header name: " + str(header_name));
             
-            
+            if header_name == None:
+                #for detail in product.xpath(".//div[@class='{}']".format(self.LIST_CLASS_NAME)):
+                for detail in product.xpath(".//div"):
+                    label = detail.xpath(".//label/text()").extract_first();
+                    #print("Label Name: " + str(label))
+                    
+                    if label == "Depre":
+                        item['depre'] = detail.xpath(".//p/text()").extract_first();
+                        #print(item['depre']);
+                        
+                    if label == "Reg. Year":
+                        item['reg_year'] = detail.xpath(".//p/text()").extract_first();
+                        #print(item['reg_year']);
+                    
+                    if label == None:
+                        image_tag = detail.xpath("boolean(.//div/div/img[contains(@src, 'price')])").extract_first();
+                        if int(image_tag) == 1:
+                            item['price'] = 'S$0'; # WE DID NOT GET PRICE IN FEW CASES
+                            item['price'] = detail.xpath(".//div/div/div/p/text()").extract_first();
+                            #print(item['price']);
+
             if header_name == "Car Details":
-                for detail in product.xpath(".//div[@class='{}']".format(self.LIST_CLASS_NAME)):
-                #for detail in product.xpath(".//div[contains(@class, '-')]/div"):
+                #for detail in product.xpath(".//div[@class='{}']".format(self.LIST_CLASS_NAME)):
+                for detail in product.xpath(".//div/div"):
                     label = detail.xpath(".//label/text()").extract_first();
                     #print("Label: " + str(label))
                     
@@ -122,7 +115,7 @@ class QuotesSpider(scrapy.Spider):
                         #print(item['engine_capicity'])
         
             
-        #print(item);
+        print(item);
         
         # write car object in file
         self.datafile.write(str(item));
