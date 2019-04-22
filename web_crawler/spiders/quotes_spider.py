@@ -16,7 +16,6 @@ class QuotesSpider(scrapy.Spider):
     datafile = None;
     
     FIRST_PAGE_PRODUCT_CLASS_NAME = 'bM-U';
-    PRODUCT_DETAIL_CLASS_NAME = 'ay-c ay-b';
    
     def __init__(self, url='https://sg.carousell.com/categories/cars-32/', *args, **kwargs):
         super(QuotesSpider, self).__init__(*args, **kwargs)
@@ -63,7 +62,7 @@ class QuotesSpider(scrapy.Spider):
         next_page = response.xpath("//ul[@class='pager']/li[contains(@class, 'pagination-next')]/a/@href").extract_first();
         next_page_url = response.urljoin(next_page);
         #print(next_page_url)
-        #yield scrapy.Request(next_page_url, callback=self.parse);
+        yield scrapy.Request(next_page_url, callback=self.parse);
         
         
     
@@ -115,7 +114,7 @@ class QuotesSpider(scrapy.Spider):
                         #print(item['engine_capicity'])
         
             
-        print(item);
+        #print(item);
         
         # write car object in file
         self.datafile.write(str(item));
