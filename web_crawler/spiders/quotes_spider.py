@@ -12,12 +12,10 @@ from datetime import datetime
 
 class QuotesSpider(scrapy.Spider):
     name = "quotes";
-    
-    #base_url = "https://sg.carousell.com/";
     datafile = None;
     
    
-    def __init__(self, url='https://sg.carousell.com/categories/cars-32/', *args, **kwargs):
+    def __init__(self, url='https://examples.com/categories/item/', *args, **kwargs):
         super(QuotesSpider, self).__init__(*args, **kwargs)
         self.start_urls = [url];
         today = datetime.now();
