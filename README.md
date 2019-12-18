@@ -26,11 +26,11 @@ scrapy crawl quotes
 
 or 
 
-scrapy crawl quotes -a url='https://sg.carousell.com/categories/cars-32/'
+scrapy crawl quotes -a url='https://sg.abc.com/'
 
 or if you want to run in background
 
-scrapy crawl quotes -a url='https://sg.carousell.com/categories/cars-32/' > 404.txt &
+scrapy crawl quotes -a url='https://sg.sbc.com' > 404.txt &
 
 
 output file will be there in main folder with time stamp.
